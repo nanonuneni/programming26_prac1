@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include "DynamicArray.h"
 
 using namespace std;
@@ -12,10 +13,10 @@ int main() {
     arr1.set(2, 100);
     arr1.print();
 
-    // Ошибки
-    arr1.set(5, 10);
-    arr1.set(0, 150);
-    arr1.get(10);
+    // Ошибки (обёрнуты в try-catch, чтобы программа не упала)
+    try { arr1.set(5, 10); } catch (const out_of_range& e) { cout << e.what() << "\n"; }
+    try { arr1.set(0, 150); } catch (const invalid_argument& e) { cout << e.what() << "\n"; }
+    try { arr1.get(10); } catch (const out_of_range& e) { cout << e.what() << "\n"; }
     cout << "\n";
 
     // === TASK 2 ===
@@ -30,7 +31,7 @@ int main() {
     cout << "--- Task 3 ---\n";
     arr2.add(42);
     arr2.print();
-    arr2.add(-200); // ошибка
+    try { arr2.add(-200); } catch (const invalid_argument& e) { cout << e.what() << "\n"; } // ошибка
     cout << "\n";
 
     // === TASK 4 ===
@@ -49,6 +50,36 @@ int main() {
 
     a.subtract(c);
     cout << "a - c: "; a.print();
+
+    // === ЗАДАНИЕ 2: Демонстрация всех трёх типов исключений ===
+    cout << "\n=== Demonstrating all three exception types ===\n";
+
+    // 1. std::out_of_range
+    cout << "\n1. Testing std::out_of_range:\n";
+    try {
+        DynamicArray arr(3);
+        arr.set(0, 10);
+        arr.get(5); // Выход за границы
+    } catch (const out_of_range& e) {
+        cout << "Caught out_of_range: " << e.what() << "\n";
+    }
+
+    // 2. std::invalid_argument
+    cout << "\n2. Testing std::invalid_argument:\n";
+    try {
+        DynamicArray arr(3);
+        arr.set(0, 200); // Значение вне диапазона
+    } catch (const invalid_argument& e) {
+        cout << "Caught invalid_argument: " << e.what() << "\n";
+    }
+
+    // 3. std::bad_alloc
+    cout << "\n3. Testing std::bad_alloc:\n";
+    try {
+        DynamicArray huge(1000000000000000ULL); // Нереально большой размер
+    } catch (const bad_alloc& e) {
+        cout << "Caught bad_alloc: " << e.what() << "\n";
+    }
 
     return 0;
 }
