@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <stdexcept>
 
 class DynamicArray {
 private:

@@ -14,6 +14,7 @@ bool DynamicArray::isValueValid(int value) const {
 
 // === Задание 1 ===
 DynamicArray::DynamicArray(size_t sz) : size(sz) {
+    // new автоматически выбросит std::bad_alloc при нехватке памяти
     data = new int[size](); 
 }
 
@@ -31,20 +32,17 @@ void DynamicArray::print() const {
 
 void DynamicArray::set(size_t index, int value) {
     if (!isIndexValid(index)) {
-        cerr << "set error: index is out of bounds.\n";
-        return;
+        throw out_of_range("set error: index is out of bounds.");
     }
     if (!isValueValid(value)) {
-        cerr << "set error: value must be in range [-100, 100].\n";
-        return;
+        throw invalid_argument("set error: value must be in range [-100, 100].");
     }
     data[index] = value;
 }
 
 int DynamicArray::get(size_t index) const {
     if (!isIndexValid(index)) {
-        cerr << "get error: index is out of bounds.\n";
-        return 0;
+        throw out_of_range("get error: index is out of bounds.");
     }
     return data[index];
 }
@@ -60,8 +58,7 @@ DynamicArray::DynamicArray(const DynamicArray& other) : size(other.size) {
 // === Задание 3 ===
 void DynamicArray::add(int value) {
     if (!isValueValid(value)) {
-        cerr << "add(int) error: value must be in [-100, 100].\n";
-        return;
+        throw invalid_argument("add(int) error: value must be in range [-100, 100].");
     }
     
     int* newData = new int[size + 1];
