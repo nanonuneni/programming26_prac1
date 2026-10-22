@@ -1,93 +1,98 @@
 #include "DynamicArray.h"
-#include <iostream>
 
-using namespace std;
-
-// === Вспомогательные методы ===
-bool DynamicArray::isIndexValid(size_t index) const {
-    return index < size;
+template <typename T>
+DynamicArray<T>::DynamicArray(size_t sz) : size(sz) {
+    data = new T[size]();
 }
 
-bool DynamicArray::isValueValid(int value) const {
-    return value >= -100 && value <= 100;
-}
-
-// === Задание 1 ===
-DynamicArray::DynamicArray(size_t sz) : size(sz) {
-    // new автоматически выбросит std::bad_alloc при нехватке памяти
-    data = new int[size](); 
-}
-
-DynamicArray::~DynamicArray() {
+template <typename T>
+DynamicArray<T>::~DynamicArray() {
     delete[] data;
 }
 
-void DynamicArray::print() const {
-    cout << "[ ";
-    for (size_t i = 0; i < size; ++i) {
-        cout << data[i] << (i + 1 < size ? ", " : "");
-    }
-    cout << " ] (size: " << size << ")\n";
-}
-
-void DynamicArray::set(size_t index, int value) {
-    if (!isIndexValid(index)) {
-        throw out_of_range("set error: index is out of bounds.");
-    }
-    if (!isValueValid(value)) {
-        throw invalid_argument("set error: value must be in range [-100, 100].");
-    }
-    data[index] = value;
-}
-
-int DynamicArray::get(size_t index) const {
-    if (!isIndexValid(index)) {
-        throw out_of_range("get error: index is out of bounds.");
-    }
-    return data[index];
-}
-
-// === Задание 2 ===
-DynamicArray::DynamicArray(const DynamicArray& other) : size(other.size) {
-    data = new int[size];
+template <typename T>
+DynamicArray<T>::DynamicArray(const DynamicArray& other) : size(other.size) {
+    data = new T[size];
     for (size_t i = 0; i < size; ++i) {
         data[i] = other.data[i];
     }
 }
 
-// === Задание 3 ===
-void DynamicArray::add(int value) {
-    if (!isValueValid(value)) {
-        throw invalid_argument("add(int) error: value must be in range [-100, 100].");
+template <typename T>
+void DynamicArray<T>::print() const {
+    std::cout << *this << "\n";
+}
+
+template <typename T>
+T DynamicArray<T>::get(size_t index) const {
+    if (index >= size) throw std::out_of_range("Index out of bounds");
+    return data[index];
+}
+
+template <typename T>
+void DynamicArray<T>::set(size_t index, const T& value) {
+    if (index >= size) throw std::out_of_range("Index out of bounds");
+    if constexpr (std::is_integral_v<T>) {
+        if (value < MIN || value > MAX) throw std::invalid_argument("Value must be in [-100, 100]");
     }
-    
-    int* newData = new int[size + 1];
-    for (size_t i = 0; i < size; ++i) {
-        newData[i] = data[i];
+    data[index] = value;
+}
+
+template <typename T>
+void DynamicArray<T>::add(const T& value) {
+    if constexpr (std::is_integral_v<T>) {
+        if (value < MIN || value > MAX) throw std::invalid_argument("Value must be in [-100, 100]");
     }
+    T* newData = new T[size + 1];
+    for (size_t i = 0; i < size; ++i) newData[i] = data[i];
     newData[size] = value;
     delete[] data;
     data = newData;
     size++;
 }
 
-// === Задание 4 ===
-void DynamicArray::add(const DynamicArray& other) {
-    for (size_t i = 0; i < size; ++i) {
-        if (i < other.size) {
-            data[i] += other.data[i];
-        }
+template <typename T>
+void DynamicArray<T>::add(const DynamicArray& other) {
+    if constexpr (std::is_arithmetic_v<T>) {
+        size_t limit = size < other.size ? size : other.size;
+        for (size_t i = 0; i < limit; ++i) data[i] += other.data[i];
+    } else {
+        throw std::bad_typeid();
     }
 }
 
-void DynamicArray::subtract(const DynamicArray& other) {
-    for (size_t i = 0; i < size; ++i) {
-        if (i < other.size) {
-            data[i] -= other.data[i];
-        }
+template <typename T>
+void DynamicArray<T>::subtract(const DynamicArray& other) {
+    if constexpr (std::is_arithmetic_v<T>) {
+        size_t limit = size < other.size ? size : other.size;
+        for (size_t i = 0; i < limit; ++i) data[i] -= other.data[i];
+    } else {
+        throw std::bad_typeid();
     }
 }
 
-size_t DynamicArray::getSize() const {
+template <typename T>
+size_t DynamicArray<T>::getSize() const {
     return size;
 }
+
+// Дистанция
+template <typename T>
+double DynamicArray<T>::distance(const DynamicArray& other) const {
+    if (size != other.size) throw std::invalid_argument("Different sizes");
+    if constexpr (!std::is_arithmetic_v<T>) {
+        throw std::bad_typeid();
+    } else {
+        double sum = 0.0;
+        for (size_t i = 0; i < size; ++i) {
+            double d = static_cast<double>(data[i]) - static_cast<double>(other.data[i]);
+            sum += d * d;
+        }
+        return std::sqrt(sum);
+    }
+}
+
+// Явное инстанцирование
+template class DynamicArray<int>;
+template class DynamicArray<double>;
+template class DynamicArray<std::string>;
