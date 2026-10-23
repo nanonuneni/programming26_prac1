@@ -6,7 +6,6 @@
 using namespace std;
 
 int main() {
-    // === TASK 1 ===
     cout << "--- Task 1 ---\n";
     DynamicArray<int> arr1(3);
     arr1.set(0, 10);
@@ -14,14 +13,12 @@ int main() {
     arr1.set(2, 100);
     arr1.print();
 
-    // Ошибки (обёрнуты в try-catch, чтобы программа не упала)
     try { arr1.set(5, 10); } catch (const out_of_range& e) { cout << e.what() << "\n"; }
     try { arr1.set(0, 150); } catch (const invalid_argument& e) { cout << e.what() << "\n"; }
     try { arr1.get(10); } catch (const out_of_range& e) { cout << e.what() << "\n"; }
 
     cout << "\n";
 
-    // === TASK 2 ===
     cout << "--- Task 2 ---\n";
     DynamicArray<int> arr2(arr1);
     arr1.set(0, 99);
@@ -30,7 +27,6 @@ int main() {
 
     cout << "\n";
 
-    // === TASK 3 ===
     cout << "--- Task 3 ---\n";
     arr2.add(42);
     arr2.print();
@@ -38,7 +34,6 @@ int main() {
 
     cout << "\n";
 
-    // === TASK 4 ===
     cout << "--- Task 4 ---\n";
     DynamicArray<int> a(4), b(2), c(5);
     a.set(0, 10); a.set(1, 20); a.set(2, 30); a.set(3, 40);
@@ -55,10 +50,8 @@ int main() {
     a.subtract(c);
     cout << "a - c: "; a.print();
 
-    // === Демонстрация всех трёх типов исключений ===
     cout << "\n=== Demonstrating all three exception types ===\n";
 
-    // 1. std::out_of_range
     cout << "\n1. Testing std::out_of_range:\n";
     try {
         DynamicArray<int> arr(3);
@@ -68,7 +61,6 @@ int main() {
         cout << "Caught out_of_range: " << e.what() << "\n";
     }
 
-    // 2. std::invalid_argument
     cout << "\n2. Testing std::invalid_argument:\n";
     try {
         DynamicArray<int> arr(3);
@@ -77,7 +69,6 @@ int main() {
         cout << "Caught invalid_argument: " << e.what() << "\n";
     }
 
-    // 3. std::bad_alloc
     cout << "\n3. Testing std::bad_alloc:\n";
     try {
         DynamicArray<int> huge(1000000000000000ULL); 
@@ -85,11 +76,8 @@ int main() {
         cout << "Caught bad_alloc: " << e.what() << "\n";
     }
 
-    // === PART 3: Templates ===
-
     cout << "\n\n=== PART 3: TEMPLATES ===\n";
 
-    // 1. Шаблонный класс и проверка данных только для целочисленных типов
     cout << "\n1. Template class and data validation:\n";
     DynamicArray<int> intArr(3);
     intArr.set(0, 10);
@@ -98,13 +86,13 @@ int main() {
     cout << "intArr: " << intArr << "\n";
 
     try {
-        intArr.set(0, 150); // Должно выбросить invalid_argument
+        intArr.set(0, 150);
     } catch (const std::invalid_argument& e) {
         cout << "Caught expected exception for int: " << e.what() << "\n";
     }
 
     DynamicArray<double> doubleArr(2);
-    doubleArr.set(0, 150.5); //
+    doubleArr.set(0, 150.5);
     cout << "Double array: " << doubleArr << "\n";
 
     DynamicArray<string> strArr(2);
@@ -112,11 +100,9 @@ int main() {
     strArr.add("World");
     cout << "String array: " << strArr << "\n";
 
-    // 2. Операция вывода <<
     cout << "\n2. Output operator <<:\n";
     cout << "Testing operator<< for int: " << intArr << "\n";
 
-    // 3. Расстояние между массивами (евклидова метрика)
     cout << "\n3. Distance between arrays (Euclidean metric):\n";
     DynamicArray<double> arrA(3), arrB(3);
     arrA.set(0, 1.0); arrA.set(1, 2.0); arrA.set(2, 2.0);
@@ -138,6 +124,69 @@ int main() {
     } catch (const bad_typeid&) {
         cout << "Caught bad_typeid for string array\n";
     }
+
+    cout << "\n\n=== PART 4: OPERATORS ===\n";
+
+    cout << "\n1. Operator[]:\n";
+    DynamicArray<int> arr_op(3);
+    arr_op[0] = 10;
+    arr_op[1] = 20;
+    arr_op[2] = 30;
+    cout << "arr_op: " << arr_op << "\n";
+    
+    try {
+        arr_op[5] = 10;
+    } catch (const out_of_range& e) {
+        cout << "Caught out_of_range for index: " << e.what() << "\n";
+    }
+
+    try {
+        arr_op[0] = 150;
+    } catch (const invalid_argument& e) {
+        cout << "Caught invalid_argument for value: " << e.what() << "\n";
+    }
+
+    cout << "\n2. Comparison operators:\n";
+    DynamicArray<int> arr_op2(3);
+    arr_op2[0] = 10; arr_op2[1] = 20; arr_op2[2] = 30;
+    
+    if (arr_op == arr_op2) cout << "arr_op == arr_op2\n";
+    else cout << "arr_op != arr_op2\n";
+
+    arr_op2[2] = 31;
+    if (arr_op != arr_op2) cout << "arr_op != arr_op2 (after modification)\n";
+
+    cout << "\n3. Compound arithmetic operators:\n";
+    DynamicArray<double> arr_a(3), arr_b(3);
+    arr_a[0] = 1.5; arr_a[1] = 2.5; arr_a[2] = 3.5;
+    arr_b[0] = 0.5; arr_b[1] = 1.0; arr_b[2] = 1.5;
+
+    arr_a += arr_b;
+    cout << "arr_a += arr_b: " << arr_a << "\n";
+
+    arr_a -= arr_b;
+    cout << "arr_a -= arr_b: " << arr_a << "\n";
+
+    arr_a += 2.0;
+    cout << "arr_a += 2.0: " << arr_a << "\n";
+
+    arr_a -= 1.0;
+    cout << "arr_a -= 1.0: " << arr_a << "\n";
+
+    cout << "\n4. Iterators (range-based for):\n";
+    DynamicArray<int> arr_iter(5);
+    for (int i = 0; i < 5; ++i) arr_iter[i] = (i + 1) * 10;
+    
+    cout << "arr_iter: ";
+    for (const auto& x : arr_iter) {
+        cout << x << " ";
+    }
+    cout << "\n";
+
+    for (auto& x : arr_iter) {
+        x += 1;
+    }
+    cout << "arr_iter after increment: " << arr_iter << "\n";
 
     return 0;
 }
