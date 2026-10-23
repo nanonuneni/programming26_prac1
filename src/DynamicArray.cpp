@@ -2,7 +2,7 @@
 
 template <typename T>
 DynamicArray<T>::DynamicArray(size_t sz) : size(sz) {
-    data = new T[size]();
+    data = new T[size];
 }
 
 template <typename T>
@@ -76,7 +76,6 @@ size_t DynamicArray<T>::getSize() const {
     return size;
 }
 
-// Дистанция
 template <typename T>
 double DynamicArray<T>::distance(const DynamicArray& other) const {
     if (size != other.size) throw std::invalid_argument("Different sizes");
@@ -92,7 +91,88 @@ double DynamicArray<T>::distance(const DynamicArray& other) const {
     }
 }
 
-// Явное инстанцирование
+template <typename T>
+typename DynamicArray<T>::ElementProxy DynamicArray<T>::operator[](size_t index) {
+    if (index >= size) throw std::out_of_range("Index out of bounds");
+    return ElementProxy(*this, index);
+}
+
+template <typename T>
+const T& DynamicArray<T>::operator[](size_t index) const {
+    if (index >= size) throw std::out_of_range("Index out of bounds");
+    return data[index];
+}
+
+template <typename T>
+bool DynamicArray<T>::operator==(const DynamicArray& other) const {
+    if (size != other.size) return false;
+    for (size_t i = 0; i < size; ++i) {
+        if (data[i] != other.data[i]) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool DynamicArray<T>::operator!=(const DynamicArray& other) const {
+    return !(*this == other);
+}
+
+template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator+=(const DynamicArray& other) {
+    add(other);
+    return *this;
+}
+
+template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator-=(const DynamicArray& other) {
+    subtract(other);
+    return *this;
+}
+
+template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator+=(const T& value) {
+    if constexpr (std::is_arithmetic_v<T>) {
+        for (size_t i = 0; i < size; ++i) {
+            data[i] += value;
+        }
+    } else {
+        throw std::bad_typeid();
+    }
+    return *this;
+}
+
+template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator-=(const T& value) {
+    if constexpr (std::is_arithmetic_v<T>) {
+        for (size_t i = 0; i < size; ++i) {
+            data[i] -= value;
+        }
+    } else {
+        throw std::bad_typeid();
+    }
+    return *this;
+}
+
+template <typename T>
+T* DynamicArray<T>::begin() {
+    return data;
+}
+
+template <typename T>
+T* DynamicArray<T>::end() {
+    return data + size;
+}
+
+template <typename T>
+const T* DynamicArray<T>::begin() const {
+    return data;
+}
+
+template <typename T>
+const T* DynamicArray<T>::end() const {
+    return data + size;
+}
+
 template class DynamicArray<int>;
 template class DynamicArray<double>;
 template class DynamicArray<std::string>;
