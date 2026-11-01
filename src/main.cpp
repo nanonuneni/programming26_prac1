@@ -71,7 +71,7 @@ int main() {
 
     cout << "\n3. Testing std::bad_alloc:\n";
     try {
-        DynamicArray<int> huge(1000000000000000ULL); 
+        DynamicArray<int> huge(5000000000ULL); 
     } catch (const bad_alloc& e) {
         cout << "Caught bad_alloc: " << e.what() << "\n";
     }
@@ -187,6 +187,43 @@ int main() {
         x += 1;
     }
     cout << "arr_iter after increment: " << arr_iter << "\n";
+
+    cout << "\n\n=== PART 5: RULE OF FIVE (MOVE SEMANTICS) ===\n";
+
+    auto processArray = [](DynamicArray<int> arr) {
+        cout << "Inside function, array size: " << arr.getSize() << "\n";
+    };
+
+    cout << "\n1. Copy semantics (pass by value without std::move):\n";
+    DynamicArray<int> arrCopy(3);
+    arrCopy[0] = 1; arrCopy[1] = 2; arrCopy[2] = 3;
+    cout << "Before function call, arrCopy: " << arrCopy << "\n";
+    processArray(arrCopy);
+    cout << "After function call, arrCopy: " << arrCopy << " (unchanged, but copy was expensive)\n";
+
+    cout << "\n2. Move semantics (pass by value with std::move):\n";
+    DynamicArray<int> arrMove(3);
+    arrMove[0] = 10; arrMove[1] = 20; arrMove[2] = 30;
+    cout << "Before function call, arrMove: " << arrMove << "\n";
+    processArray(std::move(arrMove));
+    cout << "After function call, arrMove size: " << arrMove.getSize() << " (resource was transferred, no expensive copy)\n";
+
+    cout << "\n3. Move assignment operator:\n";
+    DynamicArray<int> arrAssign1(2);
+    arrAssign1[0] = 50;
+    arrAssign1[1] = -50;
+    DynamicArray<int> arrAssign2(1);
+    arrAssign2[0] = 10;
+    
+    cout << "Before move assignment:\n";
+    cout << "arrAssign1: " << arrAssign1 << "\n";
+    cout << "arrAssign2: " << arrAssign2 << "\n";
+    
+    arrAssign2 = std::move(arrAssign1);
+    
+    cout << "After move assignment:\n";
+    cout << "arrAssign1 size: " << arrAssign1.getSize() << " (emptied)\n";
+    cout << "arrAssign2: " << arrAssign2 << " (took ownership)\n";
 
     return 0;
 }

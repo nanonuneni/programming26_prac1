@@ -43,6 +43,10 @@ public:
     explicit DynamicArray(size_t sz);
     ~DynamicArray();
     DynamicArray(const DynamicArray& other);
+
+    DynamicArray& operator=(const DynamicArray& other);
+    DynamicArray(DynamicArray&& other) noexcept;
+    DynamicArray& operator=(DynamicArray&& other) noexcept;
     
     void print() const;
     T get(size_t index) const;
