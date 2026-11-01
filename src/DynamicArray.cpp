@@ -19,6 +19,34 @@ DynamicArray<T>::DynamicArray(const DynamicArray& other) : size(other.size) {
 }
 
 template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator=(const DynamicArray& other) {
+    if (this == &other) return *this;
+    delete[] data;
+    size = other.size;
+    data = new T[size];
+    for (size_t i = 0; i < size; ++i) data[i] = other.data[i];
+    return *this;
+}
+
+template <typename T>
+DynamicArray<T>::DynamicArray(DynamicArray&& other) noexcept : data(other.data), size(other.size) {
+    other.data = nullptr;
+    other.size = 0;
+}
+
+template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator=(DynamicArray&& other) noexcept {
+    if (this == &other) return *this;
+    delete[] data;
+    data = other.data;
+    size = other.size;
+    other.data = nullptr;
+    other.size = 0;
+    return *this;
+}
+
+
+template <typename T>
 void DynamicArray<T>::print() const {
     std::cout << *this << "\n";
 }
@@ -90,6 +118,7 @@ double DynamicArray<T>::distance(const DynamicArray& other) const {
         return std::sqrt(sum);
     }
 }
+
 
 template <typename T>
 typename DynamicArray<T>::ElementProxy DynamicArray<T>::operator[](size_t index) {
